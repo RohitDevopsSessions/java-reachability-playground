@@ -1,0 +1,25 @@
+name: Code Build and Review
+on: push
+
+jobs:
+  buildjob:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the Current Repository on the runner
+        uses: actions/checkout@v4
+
+      - name: Setting up Java 17 & Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Build the code
+        run: mvn package
+
+      - name: Review the code using SonarCloud
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=rohitdevopsdemo_rohitdevopssonarcloud -Dsonar.organization=rohitdevopsdemo -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
